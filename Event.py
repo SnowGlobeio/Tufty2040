@@ -1,4 +1,5 @@
 from pimoroni import Button
+from machine import ADC, Pin
 
 button_up = Button(22, invert=False)
 button_down = Button(6, invert=False)
