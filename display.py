@@ -7,6 +7,7 @@ import jpegdec
 import qrcode
 import micropython
 import event
+from bat import *
 
 display = PicoGraphics(display=DISPLAY_TUFTY_2040, pen_type=PEN_RGB332)
 
@@ -38,6 +39,10 @@ LIGHTEST = display.create_pen(255, 255, 255)
 LIGHT = display.create_pen(134, 188, 209)
 DARK = display.create_pen(49, 106, 150)
 DARKEST = display.create_pen(46, 36, 63)
+WHITE = display.create_pen(255, 255, 255)
+BLACK = display.create_pen(0, 0, 0)
+RED = display.create_pen(200, 0, 0)
+
 
 # Change your badge and QR details here!
 #COMPANY_NAME = "LeHack KERNEL PANIC"
@@ -62,6 +67,12 @@ PADDING = 10
 COMPANY_HEIGHT = 40
 
 XSCROLL = 320
+
+# Constant for text selection
+selected_pen = display.create_pen(255, 255, 255)
+unselected_pen = display.create_pen(80, 80, 100)
+background_pen = display.create_pen(50, 50, 70)
+shadow_pen = display.create_pen(0, 0, 0)
 
 # convert a hue, saturation, and value into rgb values
 def hsv_to_rgb(h, s, v):
@@ -302,3 +313,47 @@ def hightext():
             display.set_pen(display.create_pen(r, g, b))
             display.text(message[i], cx, 15, -1, text_size)
 
+def set_backlight(bl):
+    display.set_backlight(bl)
+    
+def measure_texte(at, tz):
+    display.measure_text(at, tz)
+    
+def create_pen(zz, ee, rr):
+    display.create_pen(zz, ee, rr)
+    
+def grid():
+    grid_size = 40
+    for y in range(0, 240 / grid_size):
+        for x in range(0, 320 / grid_size):
+            h = x + y + int(t * 5)
+            h = h / 50.0
+            r, g, b = hsv_to_rgb(h, .5, 1)   
+            display.set_pen(display.create_pen(r, g, b))
+            display.rectangle(x * grid_size, y * grid_size, grid_size, grid_size)
+            
+def text(text, x, y, pen, s):
+    display.set_pen(pen)
+    display.text(text, x, y, -1, s)
+            
+def listapp(applications, scroll_position, selected_item):
+    for list_index, application in enumerate(applications):
+        distance = list_index - scroll_position
+        text_size = 4 if selected_item == list_index else 3
+
+        # center text horixontally
+        title_width = display.measure_text(application["title"], text_size)
+        text_x = int(160 - title_width / 2)
+        
+        row_height = text_size * 5 + 20
+        
+        # center list items vertically
+        text_y = int(120 + distance * row_height - (row_height / 2))
+        
+        # draw the text, selected item brightest and with shadow
+        if selected_item == list_index:
+          text(application["title"], text_x + 1, text_y + 1, shadow_pen, text_size)
+          
+        text_pen = selected_pen if selected_item == list_index else unselected_pen
+        text(application["title"], text_x, text_y, text_pen, text_size)
+            
