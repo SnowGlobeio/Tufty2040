@@ -11,7 +11,7 @@ target_scroll_position = 2
 
 applications = []
 affapp = []
-
+appnotshow = ["main.py","display.py","lux.py","file.py","bat.py","menu.py"]
 def text(text, x, y, pen, s):
     display.set_pen(pen)
     display.text(text, x, y, -1, s)
@@ -20,7 +20,8 @@ def text(text, x, y, pen, s):
 def get_applications():
     # fetch a list of the applications that are stored in the filesystem
     for file in listdir():
-        if file.endswith(".py") and file != "main.py" or "display.py" or "file.py":
+        #if file.endswith(".py") and file != "main.py":
+        if file.endswith(".py") and file not in appnotshow:    
             # convert the filename from "something_or_other.py" to "Something Or Other"
             # via weird incantations and a sprinkling of voodoo
             title = " ".join([v[:1].upper() + v[1:] for v in file[:-3].split("_")])
@@ -41,7 +42,3 @@ def launch_application(application):
             del locals()[k]
     gc.collect()
     __import__(application["file"])
-
-
-
-
